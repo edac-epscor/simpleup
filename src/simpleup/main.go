@@ -16,10 +16,11 @@ var CODENAME string
 //create a DB handle
 var db *sql.DB
 var UploadDIR string
-
+var cookieid string
 func main() {
 	var configf = ReadConfig() //this is in config.go
 	UploadDIR = configf.UploadDir
+	cookieid = configf.CookieID
 	LogFile := configf.LogDir + "simple.log"
 	var err error
 	dbuser := configf.DBUsername
@@ -45,7 +46,7 @@ func main() {
 
 	listensocket := configf.IP + ":" + configf.Port
 	router := NewRouter()
-	log.Println("shroud running on " + listensocket)
+	log.Println("simpleup running on " + listensocket)
 	log.Fatal(http.ListenAndServe(listensocket, router))
 }
 

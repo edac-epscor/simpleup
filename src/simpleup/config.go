@@ -18,6 +18,7 @@ type Config struct {
 	DBPassword string
 	DBName     string
 	UploadDir  string
+	CookieID   string
 }
 
 // Reads info from config file
