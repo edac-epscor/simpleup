@@ -41,4 +41,10 @@ var routes = Routes{
 		"/form/",
 		SimpleUpForm,
 	},
+	Route{
+              	"FileExists",
+                "GET",
+                "/exists",
+                FileExists,
+        },
 }

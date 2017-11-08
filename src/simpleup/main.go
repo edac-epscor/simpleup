@@ -15,6 +15,7 @@ var CODENAME string
 
 //create a DB handle
 var db *sql.DB
+var formdb *sql.DB
 var UploadDIR string
 var cookieid string
 func main() {
@@ -36,6 +37,26 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error on opening database connection: %s", err.Error())
 	}
+
+
+	formdbuser := configf.FormDBUsername
+        formdbpassword := configf.FormDBPassword
+        formdbname := configf.FormDBName
+        formdsn := formdbuser + ":" + formdbpassword + "@/" + formdbname
+        formdb, err = sql.Open("mysql", formdsn) // this does not really open a new connection
+        if err != nil {
+                log.Fatalf("Error on initializing form database connection: %s", err.Error())
+        }
+        formdb.SetMaxIdleConns(100)
+        err = formdb.Ping() // This DOES open a connection if necessary. This makes sure the database is accessible
+        if err != nil {
+                log.Fatalf("Error on opening database connection: %s", err.Error())
+        }
+
+
+
+
+
 	f, err := os.OpenFile(LogFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		fmt.Printf("Cant open log file")
@@ -43,6 +64,10 @@ func main() {
 	defer f.Close()
 
 	log.SetOutput(f)
+        defer f.Close()
+
+
+
 
 	listensocket := configf.IP + ":" + configf.Port
 	router := NewRouter()

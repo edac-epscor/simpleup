@@ -19,6 +19,9 @@ type Config struct {
 	DBName     string
 	UploadDir  string
 	CookieID   string
+        FormDBUsername string
+        FormDBPassword string
+        FormDBName     string
 }
 
 // Reads info from config file
