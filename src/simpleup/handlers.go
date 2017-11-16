@@ -20,7 +20,7 @@ type Exists struct {
 
 func SimpleUp(w http.ResponseWriter, r *http.Request) {
 
-	dump, err := httputil.DumpRequest(r, false)
+	_, err := httputil.DumpRequest(r, false)
 	overwrite := r.URL.Query().Get("overwrite")
 
 	if err != nil {
@@ -28,7 +28,6 @@ func SimpleUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println(string(dump))
 	token := getCookieByName(r.Cookies(), cookieid)
 	var username string
 	query := "SELECT name FROM users u INNER JOIN sessions s ON u.uid = s.uid WHERE s.sid = '" + token + "';"
@@ -43,7 +42,6 @@ func SimpleUp(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if username != "" {
-		log.Println(username + " is logged in.")
 		log.Println("Username " + username + " attempting an upload...")
 		if _, err := os.Stat(UploadDIR + "/" + username); os.IsNotExist(err) {
 			log.Println("Directory /uploads/" + username + " does not exist so making it...")
@@ -62,6 +60,7 @@ func SimpleUp(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer file.Close()
+                log.Println(file)
 		ID := r.FormValue("dsetid")
 		if ID != "" {
 			if _, err := os.Stat(UploadDIR + "/" + username + "/" + handler.Filename); os.IsNotExist(err) {
@@ -78,12 +77,15 @@ func SimpleUp(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 				defer f.Close()
-				io.Copy(f, file) //TODO!:This should have error checking...
+				_, err = io.Copy(f, file)
+					if err != nil{
+						log.Println("Copy to filesystem failed:\n")
+						log.Println(err)
+					}
 				extension := filepath.Ext(handler.Filename)
 				extension = "*" + extension
 				stmt, err := formdb.Prepare("UPDATE datasets SET filename=?, filetype=? WHERE id=?")
 				checkErr(err)
-				log.Println("SQL QUERY BY" + username + ":UPDATE datasets SET filename=" + handler.Filename + ", filetype=" + extension + " WHERE id=" + ID + ";")
 				res, err := stmt.Exec(handler.Filename, extension, ID)
 				fmt.Println(res)
 				checkErr(err)
@@ -108,7 +110,6 @@ func SimpleUp(w http.ResponseWriter, r *http.Request) {
 				oldpath := UploadDIR + "/" + username + "/" + handler.Filename
 				newpath := oldpath + "." + secs
 				os.Rename(oldpath, newpath)
-				//Should this use defer file.Close()?
 
 				log.Println("File is  " + handler.Filename)
 				if handler.Filename == "" {
@@ -122,12 +123,11 @@ func SimpleUp(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 				defer f.Close()
-				io.Copy(f, file) //TODO!: This should have error checking...
+				io.Copy(f, file)
 				extension := filepath.Ext(handler.Filename)
 				extension = "*" + extension
 				stmt, err := formdb.Prepare("UPDATE datasets SET filename=?, filetype=? WHERE id=?")
 				checkErr(err)
-				log.Println("SQL QUERY BY" + username + ":UPDATE datasets SET filename=" + handler.Filename + ", filetype=" + extension + " WHERE id=" + ID + ";")
 				res, err := stmt.Exec(handler.Filename, extension, ID)
 				fmt.Println(res)
 				checkErr(err)
@@ -157,7 +157,6 @@ func SimpleUp(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		//Hmm...defer file.Close()?
 	fmt.Println("file should close now")
 	} else if username == "" {
 		w.WriteHeader(http.StatusUnauthorized)

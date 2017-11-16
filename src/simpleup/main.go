@@ -13,7 +13,7 @@ var VERSION string
 var CODE string
 var CODENAME string
 
-//create a DB handle
+//create a new DB handle
 var db *sql.DB
 var formdb *sql.DB
 var UploadDIR string
@@ -43,12 +43,12 @@ func main() {
         formdbpassword := configf.FormDBPassword
         formdbname := configf.FormDBName
         formdsn := formdbuser + ":" + formdbpassword + "@/" + formdbname
-        formdb, err = sql.Open("mysql", formdsn) // this does not really open a new connection
+        formdb, err = sql.Open("mysql", formdsn)
         if err != nil {
                 log.Fatalf("Error on initializing form database connection: %s", err.Error())
         }
         formdb.SetMaxIdleConns(100)
-        err = formdb.Ping() // This DOES open a connection if necessary. This makes sure the database is accessible
+        err = formdb.Ping()
         if err != nil {
                 log.Fatalf("Error on opening database connection: %s", err.Error())
         }
