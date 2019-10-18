@@ -27,7 +27,9 @@ func main() {
 	dbuser := configf.DBUsername
 	dbpassword := configf.DBPassword
 	dbname := configf.DBName
-	dsn := dbuser + ":" + dbpassword + "@/" + dbname
+	dbhost := configf.DBHost
+	dbport := configf.DBPort
+	dsn := dbuser + ":" + dbpassword + "@tcp(" + dbhost + ":" + dbport + ")/" + dbname
 	db, err = sql.Open("mysql", dsn) // this does not really open a new connection
 	if err != nil {
 		log.Fatalf("Error on initializing snort database connection: %s", err.Error())
