@@ -28,7 +28,7 @@ func main() {
 	dbpassword := configf.DBPassword
 	dbname := configf.DBName
 	dbhost := configf.DBHost
-	dbpost := configf.DBPort
+	dbport := configf.DBPort
 	dsn := dbuser + ":" + dbpassword + "@tcp(" + dbhost + ":" + dbport + ")/" + dbname
 	db, err = sql.Open("mysql", dsn) // this does not really open a new connection
 	if err != nil {
