@@ -37,14 +37,14 @@ func main() {
 	db.SetMaxIdleConns(100)
 	err = db.Ping() // This DOES open a connection if necessary. This makes sure the database is accessible
 	if err != nil {
-		log.Fatalf("Error on opening database connection: %s", err.Error())
+		log.Fatalf("Error on opening drupal database connection: %s", err.Error())
 	}
 
 
 	formdbuser := configf.FormDBUsername
         formdbpassword := configf.FormDBPassword
         formdbname := configf.FormDBName
-        formdsn := formdbuser + ":" + formdbpassword + "@/" + formdbname
+        formdsn := formdbuser + ":" + formdbpassword + "@tcp(" + dbhost + ":" + dbport + ")/" + formdbname
         formdb, err = sql.Open("mysql", formdsn)
         if err != nil {
                 log.Fatalf("Error on initializing form database connection: %s", err.Error())
@@ -52,7 +52,7 @@ func main() {
         formdb.SetMaxIdleConns(100)
         err = formdb.Ping()
         if err != nil {
-                log.Fatalf("Error on opening database connection: %s", err.Error())
+                log.Fatalf("Error on opening form database connection: %s", err.Error())
         }
 
 
